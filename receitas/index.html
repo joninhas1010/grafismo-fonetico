@@ -125,12 +125,24 @@ footer{padding:24px 22px 40px;text-align:center;font-size:13px;color:var(--text-
 @keyframes nudge{50%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<!-- Meta Pixel (base). Cole o ID do SEU pixel de receitas abaixo; enquanto estiver vazio, nada é enviado. -->
+<!-- Meta Pixel Code -->
 <script>
-var FB_PIXEL_ID = ""; // ex.: "123456789012345"
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-if (FB_PIXEL_ID) { fbq('init', FB_PIXEL_ID); fbq('track', 'PageView'); }
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1065374819648474');
+fbq('track', 'PageView');
 </script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1065374819648474&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<script>var FB_PIXEL_ID = "1065374819648474"; // usado pelos eventos ViewContent/AddToCart no fim da página</script>
 </head>
 <body>
 <div id="progress"></div>
