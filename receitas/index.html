@@ -125,6 +125,12 @@ footer{padding:24px 22px 40px;text-align:center;font-size:13px;color:var(--text-
 @keyframes nudge{50%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<!-- Meta Pixel (base). Cole o ID do SEU pixel de receitas abaixo; enquanto estiver vazio, nada é enviado. -->
+<script>
+var FB_PIXEL_ID = ""; // ex.: "123456789012345"
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+if (FB_PIXEL_ID) { fbq('init', FB_PIXEL_ID); fbq('track', 'PageView'); }
+</script>
 </head>
 <body>
 <div id="progress"></div>
@@ -328,6 +334,19 @@ track.innerHTML += track.innerHTML;
       if (!paused && visible) { pos += speed * dir; wrap(); el.scrollLeft = pos; }
       requestAnimationFrame(tick);
     })();
+  });
+})();
+</script>
+<script>
+// Eventos do pixel no navegador (a compra e o início de checkout a Kiwify envia pelo servidor)
+(function () {
+  if (!FB_PIXEL_ID) return;
+  fbq('track', 'ViewContent', { content_name: 'Cozinhe com a Lu', currency: 'BRL', value: 17 });
+  document.querySelectorAll('a[href*="kiwify"]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var completo = /SaF1YOQ/.test(a.href);
+      fbq('track', 'AddToCart', { content_name: completo ? 'Plano Completo' : 'Plano Básico', currency: 'BRL', value: completo ? 17 : 10 });
+    });
   });
 })();
 </script>
