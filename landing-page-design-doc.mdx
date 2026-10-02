@@ -1,0 +1,558 @@
+---
+title: "Engenharia reversa — Landing page “Cozinhe com a Lu”"
+description: "Documentação de design para recriar a landing page de receitas (funil mobile-first, coluna de 460px)"
+source: "receitas.revitamulher.online"
+generatedAt: "2026-10-01"
+---
+
+# Engenharia reversa da landing page
+
+> **Nota de método.** Os valores abaixo foram lidos via `getComputedStyle` da página renderizada (viewport desktop de 980px), não do código-fonte original. A página foi construída em um page builder (classes `atomicat-*`), então os nomes de classe originais não são reaproveitáveis; os valores visuais, sim. Itens que **não** puderam ser lidos (estados `:hover`/`:focus`) estão marcados como *inferido*.
+
+## Visão geral
+
+- **Tipo:** página de vendas de infoproduto (funil de conversão), mobile-first.
+- **Característica principal:** em qualquer tela, o conteúdo vive em **uma única coluna de 460px** centralizada sobre o fundo creme. No desktop não existe layout em múltiplas colunas.
+- **Altura total:** ~16.035px em viewport 980px.
+- **Não há navbar tradicional.** O topo é uma *barra de oferta* estática + uma *barra de progresso de scroll* fixa de 3px.
+- **Não há formulário/inputs.** Todos os CTAs são links `<a>` para o checkout.
+
+### Ordem das seções
+
+| # | Seção | Fundo | Altura aprox. |
+|---|-------|-------|---------------|
+| 0 | Barra de oferta (topo) | `#E75431` | 57px |
+| 1 | Hero | `#FFF6E3` | 1192px |
+| 2 | “Veja o que você vai encontrar” | `#5A3522` | 1101px |
+| 3 | “Ideal para você que…” (benefícios) | `#FFF6E3` | 1801px |
+| 4 | “Você vai receber acesso imediato” | `#5A3522` | 591px |
+| 5 | “E isso não é tudo” + 7 bônus | `#5A3522` | 225 + 4203px |
+| 6 | Depoimentos | `#FFF6E3` | 798px |
+| 7 | Planos / preços (Básico e Completo) | `#FFF6E3` | ~2319px |
+| 8 | Prova social (carrossel/marquee) | `#FFF6E3` | 751px |
+| 9 | Garantia de 30 dias | `#1A9940` | ~745px |
+| 10 | Quem criou (autora) + rodapé | `#FFF6E3` | restante |
+
+O ritmo visual alterna **creme → marrom → creme → marrom → creme → verde → creme**, o que separa os blocos de argumento sem usar divisores.
+
+---
+
+# 1. Design System
+
+## 1.1 Paleta de cores
+
+| Token | Hex | RGB | Uso |
+|-------|-----|-----|-----|
+| Background (creme) | `#FFF6E3` | `rgb(255, 246, 227)` | Fundo do `body` e seções claras |
+| Marrom escuro | `#5A3522` | `rgb(90, 53, 34)` | Seções escuras, títulos H2 em fundo claro, texto de listas |
+| Coral (primária de marca) | `#FF6B4A` | `rgb(255, 107, 74)` | H1, cabeçalho do plano completo, início da barra de progresso |
+| Coral escuro | `#E75431` | `rgb(231, 84, 49)` | Barra de oferta no topo |
+| Coral de destaque de preço | `#E04D2A` | `rgb(224, 77, 42)` | Textos de destaque (“R$10 a mais”) |
+| Amarelo | `#F5C518` | `rgb(245, 197, 24)` | Selo “Recomendado”, fim da barra de progresso |
+| Verde CTA (claro) | `#2A8A45` | `rgb(42, 138, 69)` | Início do gradiente dos botões |
+| Verde CTA (escuro) | `#1E6B35` | `rgb(30, 107, 53)` | Fim do gradiente dos botões, sombra |
+| Verde garantia | `#1A9940` | `rgb(26, 153, 64)` | Fundo da seção de garantia |
+| Texto principal | `#1A1A1A` | `rgb(26, 26, 26)` | Cor padrão do `body` |
+| Texto secundário | `#555555` | `rgb(85, 85, 85)` | Parágrafos de apoio |
+| Texto muted | `#6B7280` | `rgb(107, 114, 128)` | Rótulos em caixa-alta (“TUDO O QUE VOCÊ RECEBE”) |
+| Vermelho (preço riscado) | `#E53E3E` | `rgb(229, 62, 62)` | “De: R$97” com `line-through` |
+| Texto sobre amarelo | `#3A2000` | `rgb(58, 32, 0)` | Texto do selo “Recomendado” |
+| Borda de card | `#EEE3C8` | `rgb(238, 227, 200)` | Borda 1px de cards claros |
+| Branco | `#FFFFFF` | `rgb(255, 255, 255)` | Cards de plano, textos sobre fundos escuros (`--white`) |
+
+## 1.2 Gradientes
+
+```css
+/* Botão CTA (links grandes) */
+background-image: linear-gradient(160deg, #2A8A45 0%, #1E6B35 100%);
+
+/* Chips de benefício do hero (tiles verdes) */
+background-image: linear-gradient(135deg, #2A8A45 0%, #1E6B35 100%);
+
+/* Barra de progresso de scroll (fixa no topo, 3px) */
+background-image: linear-gradient(90deg, #FF6B4A, #F5C518);
+```
+
+## 1.3 Opacidades e variações
+
+| Elemento | Valor |
+|----------|-------|
+| Card claro translúcido (hero, “+17.800 pessoas”) | `rgba(255, 255, 255, 0.55)` + borda `#EEE3C8` |
+| Card sobre fundo marrom (“Você não começa do zero”) | `rgba(255, 255, 255, 0.07)` |
+| Texto branco secundário sobre marrom | `rgba(255, 255, 255, 0.85)` |
+| Borda interna dos chips verdes | `1px solid rgba(255, 255, 255, 0.08)` |
+| Brilho superior dos botões (inset) | `inset 0 1px 0 rgba(255, 255, 255, 0.18)` |
+| Brilho superior dos chips (inset) | `inset 0 1px 0 rgba(255, 255, 255, 0.15)` |
+
+## 1.4 Sombras
+
+```css
+/* Botão CTA */
+box-shadow: 0 6px 24px rgba(30, 107, 53, 0.38),
+            inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+/* Chip verde */
+box-shadow: 0 4px 14px rgba(30, 107, 53, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+/* Card claro translúcido */
+box-shadow: 0 2px 16px rgba(90, 53, 34, 0.07);
+
+/* Card de plano (branco) */
+box-shadow: 0 6px 28px rgba(90, 53, 34, 0.13);
+```
+
+---
+
+# 2. Tipografia
+
+## 2.1 Famílias
+
+| Função | Fonte | Fallback | Pesos carregados |
+|--------|-------|----------|------------------|
+| **Títulos H1** (editorial, serifada) | **Playfair Display** | `Georgia, serif` | 700, 800, 900 |
+| **Corpo, H2, H3, botões, UI** | **Plus Jakarta Sans** | `system-ui, sans-serif` | 400, 500, 600, 700, 800 |
+| Resíduos do builder (widgets) | Roboto, Poppins, Montserrat 600 | — | não usados no layout visível |
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+/>
+```
+
+## 2.2 Escala tipográfica
+
+`html { font-size: 18px }` — portanto `1rem = 18px`.
+
+| Elemento | Fonte | Tamanho | Peso | Line-height | Letter-spacing | Cor | Alinhamento |
+|----------|-------|---------|------|-------------|----------------|-----|-------------|
+| **H1** (hero) | Playfair Display | 32px | 900 | 39.04px (~1.22) | -0.3px | `#FF6B4A` | center |
+| **H2** (seção escura) | Plus Jakarta Sans | 26px | 900 | 35.1px (1.35) | -0.3px | `#FFFFFF` | center |
+| **H2** (seção clara) | Plus Jakarta Sans | 24px | 900 | 31.2px (1.3) | -0.3px | `#5A3522` | center |
+| **H3** (cards de benefício) | Plus Jakarta Sans | 22px | 900 | 28.16px (~1.28) | normal | `#FFFFFF` | center |
+| Parágrafo de apoio | Plus Jakarta Sans | 17px | 600 | 29.24px (~1.72) | normal | `#555555` | — |
+| Corpo base | Plus Jakarta Sans | 18px | 400–600 | normal | normal | `#1A1A1A` | — |
+| Barra de oferta | Plus Jakarta Sans | 13px | 800 | — | 1px | `#FFFFFF` | center |
+| Chip do hero | Plus Jakarta Sans | 13px | 700 | 15.6px | — | `#FFFFFF` | center |
+| Texto do botão CTA | Plus Jakarta Sans | 17px | 800 | normal | 0.8px | `#FFFFFF` | center, caixa-alta |
+| Item de lista | Plus Jakarta Sans | 16px | 500 | — | normal | `#5A3522` | — |
+| Rótulo de seção (caps) | Plus Jakarta Sans | 13px | 800 | — | 1.2px | `#6B7280` | caixa-alta |
+| Selo “Recomendado” | Plus Jakarta Sans | 14px | 800 | — | 0.5px | `#3A2000` | — |
+| Título do plano | Plus Jakarta Sans | 32px | 900 | — | -0.3px | `#FFFFFF` | center |
+| Preço riscado / destaque | Plus Jakarta Sans | 16px | 600 / 900 | — | — | `#E53E3E` / `#E04D2A` | — |
+
+**Padrão:** títulos usam peso **900** com `letter-spacing: -0.3px` (levemente compactado). Rótulos pequenos em caixa-alta usam `letter-spacing` positivo (0.5px–1.2px).
+
+---
+
+# 3. Layout
+
+## 3.1 Container
+
+- Wrapper externo: `max-width: 1140px` (herdado do builder), mas o **conteúdo útil é uma coluna de 460px** (`width: 460px` em viewport ≥ 480px; 100% abaixo disso).
+- A coluna é centralizada (`margin: 0 auto`); o fundo `#FFF6E3` ocupa a página inteira.
+- Seções escuras (`#5A3522`) e verde (`#1A9940`) **cobrem apenas os 460px** da coluna — no desktop aparecem como uma “faixa” central sobre o creme.
+- **Padding lateral padrão das seções: 22px** → largura útil de conteúdo = **416px**. Cards, imagens e botões ocupam 416px (ou 380px dentro de cards com padding).
+
+## 3.2 Sistema de layout
+
+- **Flexbox em coluna** para a pilha principal de seções. Não há CSS Grid no layout visível.
+- Os chips do hero formam uma grade 2×2 (`display: grid; grid-template-columns: 1fr 1fr`, gap ≈ 8–12px, *inferido* pela medição: cada chip ≈ 204px de largura).
+- Listas de benefícios são pilhas verticais (um item por linha), separadas por linhas finas.
+
+## 3.3 Espaçamento vertical padrão
+
+| Contexto | Padding |
+|----------|---------|
+| Hero | `36px 22px` |
+| Seção escura com título | `40px 0 36px` (título tem padding lateral 22px) |
+| Seção clara | `40px 22px 36px` |
+| Seção de bônus | `0 22px 44px` |
+| Seção de depoimentos | `36px 22px 32px` |
+| Seção de garantia | `40px 22px` |
+| Bloco de benefício dentro da seção | `padding-top: 50px` |
+
+## 3.4 Breakpoints
+
+Detectados nas *media queries* da folha de estilos:
+
+| Query | Uso |
+|-------|-----|
+| `(min-width: 768px)` | Ajustes de tablet/desktop do builder |
+| `(max-width: 1024px)` | Tablet |
+| `(max-width: 480px)` | Mobile — coluna passa a 100% da largura |
+| `(prefers-reduced-motion: reduce)` | Desativa animações |
+
+Na prática, o design é **um layout só** (mobile) que apenas se centraliza em telas maiores.
+
+---
+
+# 4. Componentes
+
+## 4.1 Navbar → Barra de oferta + progresso de scroll
+
+**Não existe navbar com links.** O que ocupa o topo:
+
+**Barra de oferta (announcement bar)**
+- Altura: **57px** (padding `12px 22px`), largura 460px, **estática** (rola com a página).
+- Fundo `#E75431`, texto branco, 13px / 800 / `letter-spacing: 1px`, caixa-alta, centralizado.
+- Conteúdo: “⚡ OFERTA ESPECIAL DISPONÍVEL SÓ ATÉ {data de amanhã}” — a data é calculada por script (`tomorrow`), criando urgência dinâmica.
+
+**Barra de progresso de scroll**
+- `position: fixed; top: 0; height: 3px;` com `border-radius: 0 2px 2px 0`.
+- Gradiente `90deg, #FF6B4A → #F5C518`; a largura cresce de 0 a 100% conforme o scroll (*inferido*).
+
+Espaçamento entre itens: não aplicável (sem menu).
+
+## 4.2 Hero Section
+
+- **Layout:** coluna única, tudo **centralizado**; padding `36px 22px`; fundo creme.
+- **Ordem vertical (y em px):**
+  1. H1 — 416×156 (y=93)
+  2. Grade de 4 chips verdes — 416×104 (y=269)
+  3. Imagem de colagem de pratos + rosto — 416×416, `border-radius: 24px` (y=393)
+  4. Parágrafo de apoio — 17px / 600 / `#555` (y=831)
+  5. Card de prova social “+17.800 pessoas já pararam de…” — 416×241, `radius 24px`, fundo `rgba(255,255,255,.55)`, borda `1px #EEE3C8`, padding `20px 18px` (y=972)
+- **Título:** Playfair Display 32px / 900, coral `#FF6B4A`, ~4 linhas na largura de 416px.
+- **Chips (4):** “+200 Receitas”, “Pronto em 20 min”, “Cardápios Prontos”, “Acesso Vitalício”. Cada um: ícone emoji + texto, gradiente verde 135°, `border-radius: 14px`, `padding: 13px 8px`, 13px/700, borda `1px rgba(255,255,255,.08)`, sombra verde.
+- **CTA:** o botão principal aparece depois do bloco de conteúdo (seção 2), ver 4.4.
+
+## 4.3 Seções intermediárias
+
+### a) Seção “Veja o que você vai encontrar” (marrom `#5A3522`)
+- Título H2 branco 26px/900 centralizado (padding lateral 22px, inferior 28px).
+- Imagem/ilustração 416×555 com `border-radius: 16px`.
+- Card informativo “Você não começa do zero…”: fundo `rgba(255,255,255,.07)`, padding `20px 18px`, raio **`0 16px 16px 0`** (borda esquerda reta — indica uma barra de destaque lateral colorida, *inferido*).
+- Fecha com botão CTA verde.
+
+### b) Seção “Ideal para você que…” (creme)
+- H2 marrom 24px/900 em caixa-alta.
+- **Blocos de benefício** (5): cada um tem imagem + H3 + texto. O H3 aparece em **branco** sobre um **card coral `#FF6B4A`** (416×259, ex.: “Para você que chega exausta e trava na hora…”), espaçados por `padding-top: 50px`.
+- Estrutura repetida: `card coral (H3 branco) → imagem → texto`.
+
+### c) “Você vai receber acesso imediato a:” (marrom)
+- Rótulo em caixa-alta branco 85%, 18px/900.
+- **Card creme** (`#FFF6E3`, raio **24px**, padding `22px 18px 24px`): título “Cozinhe com a Lu” + lista de entregáveis.
+- **Lista de features:** cada `li` com `padding: 11px 8px`, `border-radius: 8px`, 16px/500, cor `#5A3522`, **ícone circular verde-escuro (~#3D5A2A)** à esquerda com *check* e linha divisória fina entre itens. Último item: “E muito mais…” em itálico, centralizado.
+
+### d) Bônus (seção “E isso não é tudo”)
+- Fundo marrom; **7 cards de bônus** empilhados (seção de ~4.200px).
+- Cada card: selo de ordem (“🔥 #1 — BÔNUS DE HOJE!”), imagem, título, valor riscado (`De: R$…` em `#E53E3E`, `line-through`) e chamada de valor “GRÁTIS”.
+
+### e) Depoimentos
+- H2 marrom 24px/900; container de 648px de altura com prints/cards de depoimento empilhados.
+- Seção posterior de **prova social em carrossel contínuo** (marquee) usando `@keyframes scrollProva`.
+
+### f) Planos / Preços
+- **Plano Básico:** preço **R$10**; card branco, `border-radius: 24px`, sombra `0 6px 28px rgba(90,53,34,.13)`, 416×898.
+- **Plano Completo (recomendado):** preço **R$17**; destacado com
+  - Selo amarelo “🔥 Recomendado”: `#F5C518`, texto `#3A2000`, 14px/800, `padding: 9px 24px`, `border-radius: 100px`;
+  - Cabeçalho coral `#FF6B4A` com título “PLANO COMPLETO” 32px/900 branco, padding `28px 22px 18px`;
+  - Rótulo “TUDO O QUE VOCÊ RECEBE” em cinza 13px/800 caps;
+  - Lista com os mesmos `li` de 4.3c;
+  - Preço antigo riscado em vermelho; “R$7 a mais” (diferença entre R$17 e R$10) em `#E04D2A`/900.
+
+### g) Garantia
+- Fundo verde sólido `#1A9940`, padding `40px 22px`, título “GARANTIA DE 30 DIAS” branco.
+
+### h) Autora + rodapé
+- Fundo creme; card branco com foto/bio (“Quem criou o Cozinhe com a Lu”), raio 24px aproximado.
+
+## 4.4 Botões
+
+**Botão CTA primário (todos os CTAs da página)**
+
+| Propriedade | Valor |
+|-------------|-------|
+| Elemento | `<a>` em bloco, largura total (416px; 380px dentro de cards) |
+| Altura | ~62px |
+| Fundo | `linear-gradient(160deg, #2A8A45, #1E6B35)` |
+| Cor do texto | `#FFFFFF` |
+| Fonte | Plus Jakarta Sans 17px / 800, `letter-spacing: 0.8px`, `text-transform: uppercase` |
+| Padding | `20px 16px` |
+| Border-radius | **16px** |
+| Borda | nenhuma |
+| Sombra | `0 6px 24px rgba(30,107,53,.38), inset 0 1px 0 rgba(255,255,255,.18)` |
+| Transição | `transform .15s, box-shadow .15s, filter …` (lida da folha de estilos) |
+| Hover *(inferido)* | `transform: translateY(-2px)` + sombra mais forte + `filter: brightness(1.05)` |
+| Active *(inferido)* | `transform: scale(.98)` |
+
+Textos observados: “QUERO MINHAS RECEITAS AGORA”, “QUERO COMEÇAR HOJE” e variações dentro dos planos.
+
+**Selo / pill:** `border-radius: 100px`, ver 4.3f.
+
+## 4.5 Inputs e formulários
+
+**A página não possui inputs, selects, textareas nem `<form>`.** Toda a conversão ocorre por links de checkout. Caso precise de um formulário no mesmo estilo, use a base abaixo (derivada do sistema, **não observada** na página original):
+
+```css
+.input {
+  width: 100%;
+  padding: 16px 18px;
+  font: 500 16px "Plus Jakarta Sans", sans-serif;
+  color: #1A1A1A;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid #EEE3C8;
+  border-radius: 16px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.input:focus {
+  border-color: #2A8A45;
+  box-shadow: 0 0 0 3px rgba(42, 138, 69, 0.25);
+}
+```
+
+## 4.6 Animações
+
+Keyframes presentes: `fadeIn`, `fadeInUp`, `fadeInDown`, `fadeInLeft`, `fadeInRight`, `zoomIn`, `bounceIn`, `swing`, `shimmer`, `claude-pulse`*, `atomicat-marquee-animation` e `scrollProva` (carrossel de prova social). Todas respeitam `prefers-reduced-motion: reduce`.
+
+\* `claude-pulse` pertence à extensão de automação do navegador, não à landing page.
+
+---
+
+# 5. CSS / Tailwind equivalente
+
+## 5.1 Configuração Tailwind
+
+```js
+// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        cream: "#FFF6E3",
+        brown: "#5A3522",
+        coral: { DEFAULT: "#FF6B4A", dark: "#E75431", price: "#E04D2A" },
+        sun: "#F5C518",
+        cta: { from: "#2A8A45", to: "#1E6B35" },
+        guarantee: "#1A9940",
+        ink: "#1A1A1A",
+        soft: "#555555",
+        muted: "#6B7280",
+        strike: "#E53E3E",
+        line: "#EEE3C8",
+      },
+      fontFamily: {
+        display: ['"Playfair Display"', "Georgia", "serif"],
+        sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+      },
+      borderRadius: { card: "24px", btn: "16px", chip: "14px" },
+      boxShadow: {
+        cta: "0 6px 24px rgba(30,107,53,.38), inset 0 1px 0 rgba(255,255,255,.18)",
+        chip: "0 4px 14px rgba(30,107,53,.28), inset 0 1px 0 rgba(255,255,255,.15)",
+        card: "0 2px 16px rgba(90,53,34,.07)",
+        plan: "0 6px 28px rgba(90,53,34,.13)",
+      },
+    },
+  },
+};
+```
+
+## 5.2 Componentes em Tailwind
+
+**Página e coluna**
+
+```html
+<body class="bg-cream font-sans text-ink text-[18px]">
+  <main class="mx-auto w-full max-w-[460px]">…</main>
+</body>
+```
+
+**Barra de oferta**
+
+```html
+<div class="bg-coral-dark px-[22px] py-3 text-center text-[13px] font-extrabold uppercase tracking-[1px] text-white">
+  ⚡ Oferta especial disponível só até 02/10/2026
+</div>
+```
+
+**Barra de progresso**
+
+```html
+<div id="progress" class="fixed left-0 top-0 z-50 h-[3px] w-0 rounded-r-sm bg-gradient-to-r from-coral to-[#F5C518]"></div>
+```
+
+**Hero**
+
+```html
+<section class="bg-cream px-[22px] py-9 text-center">
+  <h1 class="font-display text-[32px] font-black leading-[1.22] tracking-[-0.3px] text-coral">
+    +200 receitas rápidas para você parar de repetir os mesmos pratos…
+  </h1>
+
+  <div class="mt-4 grid grid-cols-2 gap-2">
+    <div class="rounded-chip border border-white/[.08] bg-gradient-to-br from-cta-from to-cta-to px-2 py-[13px] text-[13px] font-bold leading-[1.2] text-white shadow-chip">
+      🍽️ +200 Receitas
+    </div>
+    <!-- … -->
+  </div>
+
+  <img class="mt-6 w-full rounded-card" src="hero.jpg" alt="" />
+  <p class="mt-4 text-[17px] font-semibold leading-[1.72] text-soft">Tenha acesso a receitas simples…</p>
+
+  <div class="mt-5 rounded-card border border-line bg-white/55 px-[18px] py-5 shadow-card">…</div>
+</section>
+```
+
+**Seção escura**
+
+```html
+<section class="bg-brown pb-9 pt-10 text-center">
+  <h2 class="px-[22px] pb-7 text-[26px] font-black leading-[1.35] tracking-[-0.3px] text-white">…</h2>
+</section>
+```
+
+**Botão CTA**
+
+```html
+<a href="#planos"
+   class="block rounded-btn bg-[linear-gradient(160deg,#2A8A45,#1E6B35)] px-4 py-5 text-center text-[17px] font-extrabold uppercase tracking-[.8px] text-white shadow-cta transition duration-150 hover:-translate-y-0.5 hover:brightness-105 active:scale-[.98]">
+  Quero minhas receitas agora
+</a>
+```
+
+**Card de benefício coral**
+
+```html
+<div class="rounded-card bg-coral px-[18px] py-6 text-center">
+  <h3 class="text-[22px] font-black leading-[1.28] text-white">Para você que chega exausta…</h3>
+</div>
+```
+
+**Lista de features**
+
+```html
+<ul class="rounded-card bg-cream px-[18px] pb-6 pt-[22px]">
+  <li class="flex items-center gap-3 rounded-lg border-b border-brown/10 px-2 py-[11px] text-base font-medium text-brown">
+    <span class="grid h-6 w-6 place-items-center rounded-full bg-[#3D5A2A] text-xs text-white">✓</span>
+    +200 Receitas Deliciosas
+  </li>
+</ul>
+```
+
+**Plano recomendado**
+
+```html
+<div class="overflow-hidden rounded-card bg-white shadow-plan">
+  <span class="mx-auto -mb-4 block w-fit rounded-full bg-[#F5C518] px-6 py-[9px] text-sm font-extrabold tracking-[.5px] text-[#3A2000]">🔥 Recomendado</span>
+  <div class="bg-coral px-[22px] pb-[18px] pt-7 text-center text-[32px] font-black leading-tight tracking-[-0.3px] text-white">PLANO<br />COMPLETO</div>
+  <p class="mt-4 text-center text-[13px] font-extrabold uppercase tracking-[1.2px] text-muted">Tudo o que você recebe</p>
+</div>
+```
+
+**Garantia**
+
+```html
+<section class="bg-guarantee px-[22px] py-10 text-center text-white">…</section>
+```
+
+## 5.3 Script do contador de data e progresso (comportamento observado)
+
+```js
+// Data de "amanhã" na barra de oferta
+const t = new Date();
+t.setDate(t.getDate() + 1);
+document.querySelector("#offer-date").textContent =
+  t.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+
+// Progresso de scroll
+addEventListener("scroll", () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.querySelector("#progress").style.width = pct + "%";
+}, { passive: true });
+```
+
+---
+
+# 6. Tokens de Design
+
+```css
+:root {
+  /* Cores base */
+  --primary: #FF6B4A;            /* coral — H1, cabeçalho do plano */
+  --secondary: #5A3522;          /* marrom — seções escuras, títulos */
+  --background: #FFF6E3;         /* creme — fundo da página */
+  --text: #1A1A1A;               /* texto principal */
+
+  /* Texto */
+  --text-soft: #555555;
+  --text-muted: #6B7280;
+  --text-on-dark: #FFFFFF;
+  --text-on-dark-soft: rgba(255, 255, 255, 0.85);
+  --text-on-accent: #3A2000;
+
+  /* Marca / ação */
+  --primary-dark: #E75431;       /* barra de oferta */
+  --price-accent: #E04D2A;
+  --accent: #F5C518;             /* selo e fim do gradiente de progresso */
+  --cta-from: #2A8A45;
+  --cta-to: #1E6B35;
+  --guarantee: #1A9940;
+  --strike: #E53E3E;
+  --border: #EEE3C8;
+  --white: #FFFFFF;
+
+  /* Gradientes */
+  --gradient-cta: linear-gradient(160deg, var(--cta-from) 0%, var(--cta-to) 100%);
+  --gradient-chip: linear-gradient(135deg, var(--cta-from) 0%, var(--cta-to) 100%);
+  --gradient-progress: linear-gradient(90deg, var(--primary), var(--accent));
+
+  /* Superfícies translúcidas */
+  --surface-glass: rgba(255, 255, 255, 0.55);
+  --surface-on-dark: rgba(255, 255, 255, 0.07);
+
+  /* Tipografia */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --fs-root: 18px;
+  --fs-h1: 32px;
+  --fs-h2-dark: 26px;
+  --fs-h2-light: 24px;
+  --fs-h3: 22px;
+  --fs-body: 17px;
+  --fs-list: 16px;
+  --fs-small: 13px;
+  --fw-black: 900;
+  --ls-title: -0.3px;
+  --ls-button: 0.8px;
+
+  /* Layout */
+  --column-width: 460px;
+  --gutter: 22px;
+  --content-width: 416px;
+  --section-pad-y: 40px;
+
+  /* Raios */
+  --radius-card: 24px;
+  --radius-btn: 16px;
+  --radius-chip: 14px;
+  --radius-pill: 100px;
+
+  /* Sombras */
+  --shadow-cta: 0 6px 24px rgba(30, 107, 53, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --shadow-chip: 0 4px 14px rgba(30, 107, 53, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --shadow-card: 0 2px 16px rgba(90, 53, 34, 0.07);
+  --shadow-plan: 0 6px 28px rgba(90, 53, 34, 0.13);
+
+  /* Motion */
+  --transition-btn: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+html { font-size: var(--fs-root); scroll-behavior: smooth; }
+body { background: var(--background); color: var(--text); font-family: var(--font-sans); }
+```
+
+---
+
+# Limitações e pontos a validar
+
+1. **Estados `:hover` / `:focus` / `:active`**: a leitura das regras CSS desses estados foi bloqueada no ambiente, então os valores de hover e active acima são *inferidos* a partir da propriedade `transition` (transform, box-shadow, filter).
+2. **Seções não medidas em detalhe:** depoimentos, carrossel de prova social, garantia, bio da autora e rodapé foram mapeados por posição, cor de fundo e padding; textos internos e tamanhos de imagem exatos podem variar.
+3. **Cores de ícones de check** (verde-escuro) foram estimadas visualmente em screenshot (~`#3D5A2A`), não lidas do CSS.
+4. **Chip grid (2×2):** a largura de 204px por chip foi medida; o `gap` exato não foi lido.
+5. Ativos de imagem (colagem de pratos, foto da autora) são conteúdo do infoproduto — substitua pelos seus próprios.
