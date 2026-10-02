@@ -102,6 +102,27 @@ h3{font-size:22px;font-weight:900;line-height:1.28;color:#fff}
 .author .ph{aspect-ratio:1/1;max-width:220px;margin:0 auto 16px;border-radius:50%}
 .author p{font-size:16px;font-weight:600;color:var(--text-soft);line-height:1.6}
 footer{padding:24px 22px 40px;text-align:center;font-size:13px;color:var(--text-muted);line-height:1.6}
+
+/* Vitrine de receitas */
+.showcase-sub{font-size:17px;font-weight:600;line-height:1.6;color:rgba(255,255,255,.85);margin:-8px 0 22px}
+.showcase-count{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#3A2000;font-size:13px;font-weight:800;letter-spacing:.5px;padding:8px 18px;border-radius:100px;margin-bottom:18px}
+.showcase-count i{width:8px;height:8px;border-radius:50%;background:var(--primary-dark);animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+.reels{margin:0 -22px;position:relative;display:grid;gap:12px}
+.reels::before,.reels::after{content:"";position:absolute;top:0;bottom:0;width:36px;z-index:2;pointer-events:none}
+.reels::before{left:0;background:linear-gradient(90deg,var(--secondary),transparent)}
+.reels::after{right:0;background:linear-gradient(270deg,var(--secondary),transparent)}
+.reel{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y}
+.reel::-webkit-scrollbar{display:none}
+.reel-track{display:flex;gap:12px;width:max-content;padding:0 6px}
+.reel figure{position:relative;flex:none;width:190px;aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.14);box-shadow:0 8px 22px rgba(0,0,0,.28)}
+.reel:nth-child(2) figure{width:160px;aspect-ratio:1/1}
+.reel figure img{width:100%;height:100%;object-fit:cover;-webkit-user-drag:none;user-select:none}
+.reel figure::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.35))}
+.reel figcaption{position:absolute;left:8px;bottom:8px;z-index:1;background:rgba(255,255,255,.92);color:var(--secondary);font-size:11px;font-weight:800;padding:4px 9px;border-radius:100px}
+.showcase-hint{font-size:13px;font-weight:700;color:rgba(255,255,255,.7);margin-top:14px}
+.showcase-hint span{display:inline-block;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateX(6px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -130,8 +151,15 @@ footer{padding:24px 22px 40px;text-align:center;font-size:13px;color:var(--text-
 
 <!-- 2. VEJA O QUE VOCÊ VAI ENCONTRAR -->
 <section class="dark">
-  <h2>Veja o que você vai encontrar</h2>
-  <img class="pic" style="margin-top:0" src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/Pflziw7350337.png" alt="Depoimento alunas" />
+  <span class="showcase-count"><i></i>+200 RECEITAS DENTRO DO GUIA</span>
+  <h2>Veja o que você vai encontrar dentro do Cozinhe com a Lu</h2>
+  <p class="showcase-sub">Receitas organizadas, fáceis de seguir e prontas para você colocar na mesa hoje mesmo.</p>
+  <!-- TROQUE: para usar outras fotos, edite as imagens abaixo (mantenha as duas fileiras com as mesmas fotos) -->
+  <div class="reels" id="reels" aria-label="Receitas do guia">
+    <div class="reel" data-dir="1"><div class="reel-track"><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/dAsJoP6062615.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/kbYelk5075317.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/vRmdMG6631156.webp" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/CsFPLb5172087.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/RHEvku5021851.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/QWbHdi5021851.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/mia/zsxDLE7860600.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/mia/uCgySs2625343.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure></div></div>
+    <div class="reel" data-dir="-1"><div class="reel-track"><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/mia/uCgySs2625343.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/mia/zsxDLE7860600.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/QWbHdi5021851.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/RHEvku5021851.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/CsFPLb5172087.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/vRmdMG6631156.webp" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/kbYelk5075317.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure><figure><img src="https://media.atomicatmedia.net/u/R0WcDrorg9R9KKEPi5I7WCKJiu93/Pictures/dAsJoP6062615.png" alt="Receita do guia Cozinhe com a Lu" loading="lazy" draggable="false" /></figure></div></div>
+  </div>
+  <p class="showcase-hint"><span>👉</span> Deslize para ver mais receitas</p>
   <div class="note"><strong>Você não começa do zero.</strong> Tudo já está organizado: receitas, cardápios e listas prontas para você só abrir e cozinhar.</div>
   <a class="cta" href="#planos">Quero minhas receitas agora</a>
 </section>
@@ -277,6 +305,31 @@ addEventListener("scroll", function () {
 // Duplica o carrossel para loop contínuo
 var track = document.getElementById("track");
 track.innerHTML += track.innerHTML;
+
+// Vitrine de receitas: rolagem automática contínua, pausa ao tocar, deslize manual
+(function () {
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.querySelectorAll("#reels .reel").forEach(function (el) {
+    var track = el.firstElementChild;
+    track.innerHTML += track.innerHTML; // duplica para loop infinito
+    var dir = +el.dataset.dir, speed = 0.45, paused = reduce, pos = 0, timer;
+    function half() { return track.scrollWidth / 2; }
+    function wrap() { var h = half(); if (pos >= h) pos -= h; if (pos <= 0) pos += h; }
+    pos = dir < 0 ? half() / 2 : 1;
+    el.scrollLeft = pos;
+    function hold() { paused = true; clearTimeout(timer); }
+    function release() { clearTimeout(timer); timer = setTimeout(function () { paused = reduce; }, 1800); }
+    ["pointerdown", "touchstart", "wheel", "mouseenter"].forEach(function (e) { el.addEventListener(e, hold, { passive: true }); });
+    ["pointerup", "pointercancel", "touchend", "mouseleave"].forEach(function (e) { el.addEventListener(e, release, { passive: true }); });
+    el.addEventListener("scroll", function () { if (paused) { pos = el.scrollLeft; wrap(); if (Math.abs(el.scrollLeft - pos) > 1) el.scrollLeft = pos; } }, { passive: true });
+    var visible = true;
+    if ("IntersectionObserver" in window) new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(el);
+    (function tick() {
+      if (!paused && visible) { pos += speed * dir; wrap(); el.scrollLeft = pos; }
+      requestAnimationFrame(tick);
+    })();
+  });
+})();
 </script>
 </body>
 </html>
